@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 export default function AuthGate({
@@ -13,29 +13,22 @@ export default function AuthGate({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     let alive = true;
 
     (async () => {
-      const current = `${pathname}${searchParams.toString() ? `?${searchParams}` : ""}`;
-
-      // ✅ login 페이지에서는 Gate가 돌면 루프 생김 → 방지
-      if (pathname?.startsWith("/login")) {
-        if (alive) setChecking(false);
-        return;
-      }
-
       try {
         const res = await apiFetch("/auth/me");
         if (!res.ok) {
-          router.replace(`${redirectTo}?next=${encodeURIComponent(current)}`);
+          const next = encodeURIComponent(pathname || "/");
+          router.replace(`${redirectTo}?next=${next}`);
           return;
         }
       } catch {
-        router.replace(`${redirectTo}?next=${encodeURIComponent(current)}`);
+        const next = encodeURIComponent(pathname || "/");
+        router.replace(`${redirectTo}?next=${next}`);
         return;
       } finally {
         if (alive) setChecking(false);
@@ -45,7 +38,7 @@ export default function AuthGate({
     return () => {
       alive = false;
     };
-  }, [router, redirectTo, pathname, searchParams]);
+  }, [router, redirectTo, pathname]);
 
   if (checking) {
     return (
