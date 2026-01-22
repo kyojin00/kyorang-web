@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
-import AuthGate from "@/components/AuthGate";
 import ProductCard from "@/components/ProductCard";
+import { apiFetchServer } from "@/lib/api-server";
 
 type Product = {
   id: number;
@@ -13,9 +13,7 @@ type Product = {
 
 export default async function HomePage() {
   // ✅ 서버 컴포넌트에서 API 주소는 "실제로 접근 가능한 값"으로
-  const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-
-  const res = await fetch(`${API}/products?featured=1`, { cache: "no-store" });
+  const res = await apiFetchServer("/products?featured=1");
   const data = (await res.json()) as { items: Product[] };
   const items = data.items ?? [];
 

@@ -20,7 +20,6 @@ export default async function ProductDetailPage({
   const { id } = await params;     // ✅ 여기서 unwrap
   const productId = Number(id);
 
-  // const API = "http://192.168.0.122:3001";
   const API = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:3001";
 
   const res = await fetch(`${API}/products/${productId}`, { cache: "no-store" });
