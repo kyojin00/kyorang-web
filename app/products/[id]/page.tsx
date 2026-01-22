@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
-import AuthGate from "@/components/AuthGate";
 import AddToCartButton from "@/components/AddToCartButton";
-
+``
 type Product = {
   id: number;
   name: string;
@@ -46,7 +45,6 @@ export default async function ProductDetailPage({
   return (
     <div>
       <Header />
-      <AuthGate>
         <main className="container">
           <div
             className="card"
@@ -134,7 +132,6 @@ export default async function ProductDetailPage({
             </div>
           </div>
         </main>
-      </AuthGate>
     </div>
   );
 }

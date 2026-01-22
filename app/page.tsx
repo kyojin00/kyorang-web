@@ -31,8 +31,6 @@ export default async function HomePage() {
   return (
     <div>
       <Header />
-
-      <AuthGate>
         <main className="container" style={{ paddingTop: 18, paddingBottom: 40 }}>
           {/* ✅ HERO */}
           <section
@@ -181,7 +179,6 @@ export default async function HomePage() {
             © {new Date().getFullYear()} kyorang.shop
           </footer>
         </main>
-      </AuthGate>
     </div>
   );
 }
