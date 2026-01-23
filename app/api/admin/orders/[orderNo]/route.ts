@@ -1,8 +1,9 @@
 import { proxy } from "@/app/api/_proxy";
+import { NextRequest } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { orderNo: string } }
-) {
-  return proxy(req, `/admin/orders/${params.orderNo}`);
+type Ctx = { params: Promise<{ orderNo: string }> };
+
+export async function GET(req: NextRequest, { params }: Ctx) {
+  const { orderNo } = await params;
+  return proxy(req, `/admin/orders/${orderNo}`);
 }

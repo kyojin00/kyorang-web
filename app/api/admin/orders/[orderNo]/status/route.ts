@@ -1,21 +1,9 @@
 import { proxy } from "@/app/api/_proxy";
+import { NextRequest } from "next/server";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { orderNo: string } }
-) {
-  return proxy(
-    req,
-    `/admin/orders/${encodeURIComponent(params.orderNo)}/status`
-  );
-}
+type Ctx = { params: Promise<{ orderNo: string }> };
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { orderNo: string } }
-) {
-  return proxy(
-    req,
-    `/admin/orders/${encodeURIComponent(params.orderNo)}/status`
-  );
+export async function POST(req: NextRequest, { params }: Ctx) {
+  const { orderNo } = await params;
+  return proxy(req, `/admin/orders/${orderNo}/status`);
 }
