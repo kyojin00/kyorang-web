@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
@@ -28,6 +28,20 @@ type OrderItem = {
 };
 
 export default function OrderSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="card" style={{ padding: 18, maxWidth: 720, margin: "0 auto" }}>
+          <div style={{ opacity: 0.7 }}>주문 정보를 불러오는 중…</div>
+        </div>
+      }
+    >
+      <OrderSuccessInner />
+    </Suspense>
+  );
+}
+
+function OrderSuccessInner() {
   const router = useRouter();
   const sp = useSearchParams();
   const orderNo = sp.get("orderNo") || "";
@@ -61,8 +75,6 @@ export default function OrderSuccessPage() {
         return;
       }
 
-      // 백엔드가 orders row 그대로 주면 snake_case, 가공해서 주면 camelCase일 수 있음
-      // 일단 snake_case 기준으로 처리 (필요하면 여기만 조정)
       setOrder(data.order || null);
       setItems(data.items || []);
       setLoading(false);
@@ -180,15 +192,9 @@ export default function OrderSuccessPage() {
           </div>
 
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" }}>
-            <a className="btn" href="/" style={{ textDecoration: "none" }}>
-              홈으로
-            </a>
-            <a className="btn" href="/products" style={{ textDecoration: "none" }}>
-              계속 쇼핑하기
-            </a>
-            <a className="btn pink" href="/mypage" style={{ textDecoration: "none" }}>
-              주문 확인(마이페이지)
-            </a>
+            <a className="btn" href="/" style={{ textDecoration: "none" }}>홈으로</a>
+            <a className="btn" href="/products" style={{ textDecoration: "none" }}>계속 쇼핑하기</a>
+            <a className="btn pink" href="/mypage" style={{ textDecoration: "none" }}>주문 확인(마이페이지)</a>
           </div>
         </div>
       </div>
