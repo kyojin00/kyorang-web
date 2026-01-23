@@ -5,5 +5,5 @@ type Ctx = { params: Promise<{ orderNo: string }> };
 
 export async function GET(req: NextRequest, { params }: Ctx) {
   const { orderNo } = await params;
-  return proxy(req, `/orders/${orderNo}`);
+  return proxy(req, `/admin/orders/${orderNo}`);
 }
