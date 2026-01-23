@@ -28,7 +28,6 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Header />
         <main className="container" style={{ paddingTop: 18, paddingBottom: 40 }}>
           {/* ✅ HERO */}
           <section

@@ -5,7 +5,6 @@ import MypageClient from "./MypageClient";
 export default function MyPage() {
   return (
     <div>
-      <Header />
       <AuthGate>
         <main className="container" style={{ paddingTop: 18, paddingBottom: 40 }}>
           <MypageClient />

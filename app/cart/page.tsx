@@ -7,7 +7,6 @@ import { Suspense } from "react";
 export default function CartPage() {
   return (
     <div>
-      <Header />
       <AuthGate>
         <main className="container">
           <Suspense

@@ -26,7 +26,6 @@ export default async function ProductDetailPage({
   if (!res.ok) {
     return (
       <div>
-        <Header />
         <main className="container">
           <div className="card" style={{ padding: 18 }}>
             상품을 찾을 수 없어요.
@@ -44,7 +43,7 @@ export default async function ProductDetailPage({
 
   return (
     <div>
-      <Header />
+
         <main className="container">
           <div
             className="card"

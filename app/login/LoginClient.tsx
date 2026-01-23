@@ -22,6 +22,7 @@ export default function LoginClient() {
     setLoading(true);
 
     try {
+      // 1) 로그인
       const res = await apiFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
@@ -29,12 +30,25 @@ export default function LoginClient() {
 
       const data = await res.json().catch(() => ({}));
 
+      // ✅ 실패면 여기서 끝
       if (!res.ok) {
         setError(data?.message || "로그인 실패");
         return;
       }
 
-      router.replace(next);
+      // 2) 로그인 성공 → 내 정보(역할) 조회
+      const meRes = await apiFetch("/auth/me");
+      const me = await meRes.json().catch(() => ({}));
+
+      // meRes가 깨져도 일단 next로 보냄(UX)
+      if (meRes.ok && me?.user?.role === "ADMIN") {
+        router.replace("/admin/orders");
+        return;
+      }
+
+      // 3) 일반 유저 → next로
+      router.replace(next || "/");
+      router.refresh(); // 헤더 등 로그인 상태 즉시 반영용
     } catch {
       setError("네트워크 오류가 발생했어요. 잠시 후 다시 시도해줘.");
     } finally {
@@ -45,7 +59,6 @@ export default function LoginClient() {
   return (
     <main className="authPage">
       <section className="authCard">
-        <header className="authHeader">
           <div className="authTitleRow">
             <div className="authIcon">🐰</div>
             <div className="authTitles">
@@ -53,8 +66,6 @@ export default function LoginClient() {
               <span>교랑상점 계정으로 로그인해줘 ✨</span>
             </div>
           </div>
-        </header>
-
         <div className="authBody">
           {error && <div className="authError">⚠️ {error}</div>}
 
@@ -93,10 +104,6 @@ export default function LoginClient() {
 
             <div className="metaRow">
               <a href={`/signup?next=${encodeURIComponent(next)}`}>회원가입</a>
-            </div>
-
-            <div className="smallHint">
-              로그인 후 자동으로 <b>{next}</b> 로 이동해요
             </div>
           </form>
         </div>

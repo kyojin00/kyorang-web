@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 type CartItem = {
   cart_item_id: number;
@@ -78,6 +79,8 @@ export default function CartClient() {
     load();
   };
 
+  const router = useRouter();
+  
   return (
     <div className="card" style={{ padding: 18 }}>
       <h1 style={{ marginTop: 0 }}>장바구니</h1>
@@ -184,7 +187,11 @@ export default function CartClient() {
         <a className="btn" href="/" style={{ textDecoration: "none" }}>
           계속 쇼핑하기
         </a>
-        <button className="btn pink" type="button" onClick={() => alert("다음 단계: 주문/결제 연결!")}>
+        <button
+          className="btn pink"
+          type="button"
+          onClick={() => router.push("/checkout")}
+        >
           결제하기
         </button>
       </div>
