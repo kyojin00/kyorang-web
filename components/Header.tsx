@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/api";
 
 type Me = {
@@ -18,52 +18,44 @@ export default function Header() {
     return e ?? "";
   }, [me]);
 
-  useEffect(() => {
-    let alive = true;
-
-    (async () => {
-      try {
-        // 1) 로그인 확인
-        const meRes = await apiFetch("/auth/me");
-        if (!meRes.ok) {
-          if (!alive) return;
-          setMe(null);
-          setCartCount(0);
-          return;
-        }
-
-        const meData = (await meRes.json()) as Me;
-        if (!alive) return;
-        setMe(meData);
-
-        // 2) 로그인일 때만 장바구니 호출
-        const cartRes = await apiFetch("/cart");
-        if (!cartRes.ok) {
-          if (!alive) return;
-          setCartCount(0);
-          return;
-        }
-
-        const cartData = await cartRes.json();
-        const items = Array.isArray(cartData?.items) ? cartData.items : [];
-        const cnt = items.reduce(
-          (s: number, it: any) => s + (Number(it.quantity) || 0),
-          0
-        );
-
-        if (!alive) return;
-        setCartCount(cnt);
-      } catch {
-        if (!alive) return;
+  const load = useCallback(async () => {
+    try {
+      // 1) 로그인 확인
+      const meRes = await apiFetch("/auth/me");
+      if (!meRes.ok) {
         setMe(null);
         setCartCount(0);
+        return;
       }
-    })();
 
-    return () => {
-      alive = false;
-    };
+      const meData = (await meRes.json()) as Me;
+      setMe(meData);
+
+      // 2) 로그인일 때만 장바구니 호출
+      const cartRes = await apiFetch("/cart");
+      if (!cartRes.ok) {
+        setCartCount(0);
+        return;
+      }
+
+      const cartData = await cartRes.json();
+      const items = Array.isArray(cartData?.items) ? cartData.items : [];
+      const cnt = items.reduce((s: number, it: any) => s + (Number(it.quantity) || 0), 0);
+      setCartCount(cnt);
+    } catch {
+      setMe(null);
+      setCartCount(0);
+    }
   }, []);
+
+  useEffect(() => {
+    load(); // 최초 1회
+
+    // ✅ 로그인/로그아웃 직후 즉시 반영
+    const onAuthChanged = () => load();
+    window.addEventListener("auth-changed", onAuthChanged);
+    return () => window.removeEventListener("auth-changed", onAuthChanged);
+  }, [load]);
 
   return (
     <header className="headerWrap">
@@ -101,6 +93,7 @@ export default function Header() {
                   type="button"
                   onClick={async () => {
                     await apiFetch("/auth/logout", { method: "POST" });
+                    window.dispatchEvent(new Event("auth-changed"));
                     location.href = "/";
                   }}
                 >

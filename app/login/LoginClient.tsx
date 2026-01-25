@@ -30,25 +30,25 @@ export default function LoginClient() {
 
       const data = await res.json().catch(() => ({}));
 
-      // ✅ 실패면 여기서 끝
       if (!res.ok) {
         setError(data?.message || "로그인 실패");
         return;
       }
 
-      // 2) 로그인 성공 → 내 정보(역할) 조회
-      const meRes = await apiFetch("/auth/me");
+      // 2) ✅ 쿠키 반영 확인 겸 me 조회 (로그인 직후 1번은 꼭)
+      const meRes = await apiFetch("/auth/me", { method: "GET" });
       const me = await meRes.json().catch(() => ({}));
 
-      // meRes가 깨져도 일단 next로 보냄(UX)
+      // 3) ✅ 여기서 refresh를 먼저!
+      // 서버 컴포넌트(Header 등)가 새 쿠키 기준으로 다시 렌더됨
+      router.refresh();
+
+      // 4) 이동
       if (meRes.ok && me?.user?.role === "ADMIN") {
         router.replace("/admin/orders");
-        return;
+      } else {
+        router.replace(next || "/");
       }
-
-      // 3) 일반 유저 → next로
-      router.replace(next || "/");
-      router.refresh(); // 헤더 등 로그인 상태 즉시 반영용
     } catch {
       setError("네트워크 오류가 발생했어요. 잠시 후 다시 시도해줘.");
     } finally {
@@ -59,13 +59,14 @@ export default function LoginClient() {
   return (
     <main className="authPage">
       <section className="authCard">
-          <div className="authTitleRow">
-            <div className="authIcon">🐰</div>
-            <div className="authTitles">
-              <b>로그인</b>
-              <span>교랑상점 계정으로 로그인해줘 ✨</span>
-            </div>
+        <div className="authTitleRow">
+          <div className="authIcon">🐰</div>
+          <div className="authTitles">
+            <b>로그인</b>
+            <span>교랑상점 계정으로 로그인해줘 ✨</span>
           </div>
+        </div>
+
         <div className="authBody">
           {error && <div className="authError">⚠️ {error}</div>}
 
